@@ -5,20 +5,28 @@ from sqlalchemy.orm import defer
 from app.database import get_db
 from app.models import Trade
 from app.schemas import PositionList, OrderDetail
-from typing import List
+from typing import List, Optional
 import httpx
 import os
+from dotenv import load_dotenv
+
+# 加载环境变量
+load_dotenv()
 
 router = APIRouter(prefix="/api/positions", tags=["positions"])
 
-OANDA_API_KEY = os.getenv("OANDA_API_KEY")
-OANDA_ACCOUNT_ID = os.getenv("OANDA_ACCOUNT_ID")
+OANDA_API_KEY = os.getenv("OANDA_API_KEY", "")
+OANDA_ACCOUNT_ID = os.getenv("OANDA_ACCOUNT_ID", "")
 OANDA_API_URL = os.getenv("OANDA_API_URL", "https://api-fxpractice.oanda.com")
 
-async def get_oanda_price(symbol: str) -> float:
+async def get_oanda_price(symbol: str) -> Optional[float]:
     """从 OANDA 获取实时价格"""
+    if not OANDA_API_KEY or not OANDA_ACCOUNT_ID:
+        print("警告: OANDA API 配置未设置")
+        return None
+    
     try:
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=10.0) as client:
             headers = {
                 "Authorization": f"Bearer {OANDA_API_KEY}",
                 "Content-Type": "application/json"
@@ -127,4 +135,3 @@ async def get_position_detail(intent_id: str, db: AsyncSession = Depends(get_db)
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"获取持仓详情失败: {str(e)}")
-

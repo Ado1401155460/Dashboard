@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, case
+from sqlalchemy import select
 from app.database import get_db
 from app.models import Trade
 from app.schemas import AccountStats, EquityCurveResponse, EquityCurvePoint
 from typing import List
-from datetime import datetime, timedelta
+from datetime import datetime
 
 router = APIRouter(prefix="/api/analytics", tags=["analytics"])
 
@@ -68,7 +68,7 @@ async def get_account_stats(db: AsyncSession = Depends(get_db)):
                 # 更新峰值和回撤
                 if current_balance > peak_balance:
                     peak_balance = current_balance
-                drawdown = (peak_balance - current_balance) / peak_balance * 100
+                drawdown = (peak_balance - current_balance) / peak_balance * 100 if peak_balance > 0 else 0
                 if drawdown > max_drawdown:
                     max_drawdown = drawdown
                 
@@ -169,4 +169,3 @@ async def get_equity_curve(db: AsyncSession = Depends(get_db)):
         return EquityCurveResponse(data=equity_data)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"获取收益曲线失败: {str(e)}")
-
