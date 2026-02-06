@@ -1,0 +1,122 @@
+/* Markdown 样式 */
+.markdown-content {
+  color: #f8fafc;
+  line-height: 1.8;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
+  color: #f8fafc;
+  font-weight: 700;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+}
+
+.markdown-content h1 {
+  font-size: 2em;
+  border-bottom: 2px solid #334155;
+  padding-bottom: 0.3em;
+}
+
+.markdown-content h2 {
+  font-size: 1.5em;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 0.3em;
+}
+
+.markdown-content h3 {
+  font-size: 1.25em;
+}
+
+.markdown-content p {
+  margin-bottom: 1em;
+  color: #cbd5e1;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  margin-left: 1.5em;
+  margin-bottom: 1em;
+  color: #cbd5e1;
+}
+
+.markdown-content li {
+  margin-bottom: 0.5em;
+}
+
+.markdown-content code {
+  background-color: #1e293b;
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9em;
+  color: #10b981;
+}
+
+.markdown-content pre {
+  background-color: #1e293b;
+  padding: 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin-bottom: 1em;
+}
+
+.markdown-content pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+.markdown-content blockquote {
+  border-left: 4px solid #3b82f6;
+  padding-left: 1em;
+  margin-left: 0;
+  margin-bottom: 1em;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.markdown-content a {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+.markdown-content a:hover {
+  color: #60a5fa;
+}
+
+.markdown-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1em;
+}
+
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid #334155;
+  padding: 0.75em;
+  text-align: left;
+}
+
+.markdown-content th {
+  background-color: #1e293b;
+  font-weight: 600;
+}
+
+.markdown-content strong {
+  color: #f8fafc;
+  font-weight: 600;
+}
+
+.markdown-content em {
+  color: #cbd5e1;
+  font-style: italic;
+}
+
+.markdown-content hr {
+  border: none;
+  border-top: 1px solid #334155;
+  margin: 2em 0;
+}
+
