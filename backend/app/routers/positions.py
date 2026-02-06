@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, or_, func
 from sqlalchemy.orm import defer
 from app.database import get_db
 from app.models import Trade
@@ -103,10 +103,17 @@ async def get_open_positions(db: AsyncSession = Depends(get_db)):
     获取持仓列表（已成交的订单）
     使用 defer 延迟加载 ai_article 字段
     容错处理：NULL 值显示为 0 或空字符串
+    支持大小写状态值：open, OPEN
     """
     try:
-        # 查询状态为 open 的订单
-        stmt = select(Trade).where(Trade.status == "open").options(
+        # 查询状态为 open 的订单（支持大小写）
+        stmt = select(Trade).where(
+            or_(
+                func.lower(Trade.status) == 'open',
+                Trade.status == 'open',
+                Trade.status == 'OPEN'
+            )
+        ).options(
             defer(Trade.ai_article),
             defer(Trade.analysisJson)
         ).order_by(Trade.created_at.desc())
@@ -159,11 +166,16 @@ async def get_position_detail(intent_id: str, db: AsyncSession = Depends(get_db)
     """
     获取持仓详情（包含完整数据和 AI 分析报告）
     容错处理：NULL 值显示为 0 或空字符串
+    支持大小写状态值
     """
     try:
         stmt = select(Trade).where(
             Trade.intent_id == intent_id,
-            Trade.status == "open"
+            or_(
+                func.lower(Trade.status) == 'open',
+                Trade.status == 'open',
+                Trade.status == 'OPEN'
+            )
         )
         result = await db.execute(stmt)
         trade = result.scalar_one_or_none()

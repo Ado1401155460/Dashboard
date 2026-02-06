@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, or_, func
 from sqlalchemy.orm import defer
 from app.database import get_db
 from app.models import Trade
@@ -71,10 +71,17 @@ async def get_pending_orders(db: AsyncSession = Depends(get_db)):
     获取挂单列表（未成交的限价单）
     使用 defer 延迟加载 ai_article 字段
     容错处理：NULL 值显示为 0 或空字符串
+    支持大小写状态值：pending, PENDING
     """
     try:
-        # 查询状态为 pending 的订单，延迟加载大文本字段
-        stmt = select(Trade).where(Trade.status == "pending").options(
+        # 查询状态为 pending 的订单（支持大小写）
+        stmt = select(Trade).where(
+            or_(
+                func.lower(Trade.status) == 'pending',
+                Trade.status == 'pending',
+                Trade.status == 'PENDING'
+            )
+        ).options(
             defer(Trade.ai_article),
             defer(Trade.analysisJson)
         ).order_by(Trade.created_at.desc())
@@ -113,11 +120,16 @@ async def get_pending_order_detail(intent_id: str, db: AsyncSession = Depends(ge
     """
     获取挂单详情（包含完整数据和 AI 分析报告）
     容错处理：NULL 值显示为 0 或空字符串
+    支持大小写状态值
     """
     try:
         stmt = select(Trade).where(
             Trade.intent_id == intent_id,
-            Trade.status == "pending"
+            or_(
+                func.lower(Trade.status) == 'pending',
+                Trade.status == 'pending',
+                Trade.status == 'PENDING'
+            )
         )
         result = await db.execute(stmt)
         trade = result.scalar_one_or_none()
