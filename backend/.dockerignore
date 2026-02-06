@@ -1,7 +1,0 @@
-.git/
-.gitignore
-*.md
-*.ps1
-*.sh
-docker-compose.yml
-
