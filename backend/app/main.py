@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import orders, positions, analytics, webhook
+from app.routers import orders, positions, analytics, webhook, api_config
 import os
 import logging
 
@@ -13,7 +13,7 @@ logging.basicConfig(
 app = FastAPI(
     title="量化交易分析 API",
     description="用于同步和分析 OANDA 交易所订单数据的 API（双层数据同步架构）",
-    version="2.0.0"
+    version="2.1.0"
 )
 
 # CORS 配置
@@ -29,25 +29,27 @@ app.add_middleware(
 app.include_router(orders.router)
 app.include_router(positions.router)
 app.include_router(analytics.router)
-app.include_router(webhook.router)  # 新增 Webhook 路由
+app.include_router(webhook.router)
+app.include_router(api_config.router)  # 新增 API配置 路由
 
 @app.get("/")
 async def root():
     return {
-        "message": "量化交易分析 API v2.0",
-        "version": "2.0.0",
+        "message": "量化交易分析 API v2.1",
+        "version": "2.1.0",
         "features": [
             "双层数据同步（N8N 轮询 + OANDA Webhook）",
             "实时价格更新",
             "账户摘要同步",
-            "历史交易记录"
+            "历史交易记录",
+            "API配置管理（支持多交易所切换）"
         ],
         "docs": "/docs"
     }
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "version": "2.0.0"}
+    return {"status": "healthy", "version": "2.1.0"}
 
 if __name__ == "__main__":
     import uvicorn

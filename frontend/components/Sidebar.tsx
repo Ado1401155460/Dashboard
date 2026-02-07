@@ -2,13 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Package, TrendingUp, BarChart3, Home } from 'lucide-react'
+import { Package, TrendingUp, BarChart3, Home, Settings } from 'lucide-react'
 
 const navigation = [
   { name: '首页', href: '/', icon: Home },
   { name: '挂单模块', href: '/orders', icon: Package },
   { name: '头寸模块', href: '/positions', icon: TrendingUp },
   { name: '交易分析', href: '/analytics', icon: BarChart3 },
+  { name: 'API设置', href: '/settings', icon: Settings },
 ]
 
 export default function Sidebar() {

@@ -52,3 +52,21 @@ class AccountSummary(Base):
     open_order_count = Column(Integer)  # 挂单数量
     last_transaction_id = Column(Text)  # 最后交易ID
     updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class ApiConfig(Base):
+    """API配置表 - 用于存储交易所API配置"""
+    __tablename__ = "api_config"
+
+    id = Column(Integer, primary_key=True, index=True)
+    exchange_name = Column(String, nullable=False)  # 交易所名称 (OANDA, Binance, etc.)
+    api_url = Column(Text, nullable=False)  # API基础URL
+    account_id = Column(Text)  # 账户ID
+    api_key = Column(Text)  # API Key
+    api_secret = Column(Text)  # API Secret (加密存储)
+    access_token = Column(Text)  # Access Token
+    is_active = Column(Integer, default=1)  # 是否启用 (1=启用, 0=禁用)
+    is_testnet = Column(Integer, default=0)  # 是否测试网 (1=是, 0=否)
+    extra_config = Column(JSONB)  # 额外配置 (JSON格式)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

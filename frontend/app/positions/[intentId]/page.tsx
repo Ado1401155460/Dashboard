@@ -219,7 +219,7 @@ export default function PositionDetailPage() {
               AI 交易分析报告
             </span>
           </h2>
-          <div className="prose prose-invert prose-purple max-w-none">
+          <div className="prose prose-invert prose-purple max-w-none overflow-hidden">
             <ReactMarkdown remarkPlugins={[remarkGfm]} className="markdown-content">
               {position.ai_article}
             </ReactMarkdown>

@@ -178,7 +178,7 @@ export default function OrderDetailPage() {
               AI 交易分析报告
             </span>
           </h2>
-          <div className="prose prose-invert prose-blue max-w-none">
+          <div className="prose prose-invert prose-blue max-w-none overflow-hidden">
             <ReactMarkdown remarkPlugins={[remarkGfm]} className="markdown-content">
               {order.ai_article}
             </ReactMarkdown>

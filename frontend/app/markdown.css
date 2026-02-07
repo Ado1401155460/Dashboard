@@ -4,6 +4,15 @@
   line-height: 1.8;
 }
 
+/* 图片自适应 */
+.markdown-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1em 0;
+  display: block;
+}
+
 .markdown-content h1,
 .markdown-content h2,
 .markdown-content h3,
