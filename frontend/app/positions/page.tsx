@@ -3,7 +3,7 @@
 import useSWR from 'swr'
 import { api } from '@/lib/api'
 import Link from 'next/link'
-import { Clock, TrendingUp, TrendingDown, DollarSign, Activity } from 'lucide-react'
+import { Clock, TrendingUp, TrendingDown, Activity, DollarSign, ExternalLink } from 'lucide-react'
 
 interface Position {
   id: number
@@ -24,21 +24,20 @@ export default function PositionsPage() {
   const { data: positions, error, isLoading } = useSWR<Position[]>(
     '/api/positions/open',
     api.getOpenPositions,
-    { refreshInterval: 3000 } // 每3秒刷新一次
+    { refreshInterval: 3000 }
   )
 
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse">
         <div className="h-8 bg-dark-800 rounded-lg w-1/3"></div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="glass-effect rounded-xl p-6 space-y-4">
-              <div className="h-4 bg-dark-800 rounded w-2/3"></div>
-              <div className="h-4 bg-dark-800 rounded w-1/2"></div>
-              <div className="h-4 bg-dark-800 rounded w-3/4"></div>
-            </div>
-          ))}
+        <div className="glass-effect rounded-xl p-6">
+          <div className="h-12 bg-dark-800 rounded mb-4"></div>
+          <div className="space-y-3">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="h-16 bg-dark-800 rounded"></div>
+            ))}
+          </div>
         </div>
       </div>
     )
@@ -56,6 +55,7 @@ export default function PositionsPage() {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* 头部 */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">头寸模块</h1>
@@ -77,128 +77,137 @@ export default function PositionsPage() {
         </div>
       </div>
 
+      {/* 列表容器 */}
       {positions && positions.length === 0 ? (
         <div className="glass-effect rounded-xl p-12 text-center">
           <Activity className="w-16 h-16 text-dark-600 mx-auto mb-4" />
           <p className="text-dark-400 text-lg">暂无持仓</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {positions?.map((position, index) => {
-            const isProfitable = (position.unrealized_pl || 0) >= 0
-            
-            return (
-              <Link
-                key={position.id}
-                href={`/positions/${position.intent_id}`}
-                className="group"
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                <div className={`glass-effect rounded-xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer border ${
-                  isProfitable 
-                    ? 'border-transparent hover:border-green-500/30' 
-                    : 'border-transparent hover:border-red-500/30'
-                }`}>
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-xl font-bold text-purple-400">{position.symbol}</h3>
-                      <p className="text-xs text-dark-500 font-mono mt-1">
-                        {position.intent_id.substring(0, 8)}...
-                      </p>
-                    </div>
-                    <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+        <div className="glass-effect rounded-xl overflow-hidden">
+          {/* 表头 */}
+          <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-dark-800/50 border-b border-dark-700 text-sm font-semibold text-dark-400">
+            <div className="col-span-2">交易对</div>
+            <div className="col-span-1 text-center">方向</div>
+            <div className="col-span-1 text-right">数量</div>
+            <div className="col-span-1 text-right">成交价</div>
+            <div className="col-span-1 text-right">市价</div>
+            <div className="col-span-1 text-right">止损</div>
+            <div className="col-span-1 text-right">止盈</div>
+            <div className="col-span-1 text-right">浮动盈亏</div>
+            <div className="col-span-1 text-right">保证金</div>
+            <div className="col-span-1 text-center">时间</div>
+            <div className="col-span-1 text-center">操作</div>
+          </div>
+
+          {/* 列表内容 */}
+          <div className="divide-y divide-dark-700">
+            {positions?.map((position, index) => {
+              const isProfitable = (position.unrealized_pl || 0) >= 0
+              
+              return (
+                <div
+                  key={position.id}
+                  className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-dark-800/30 transition-colors"
+                  style={{ animationDelay: `${index * 30}ms` }}
+                >
+                  {/* 交易对 */}
+                  <div className="col-span-2 flex flex-col justify-center">
+                    <span className="font-bold text-purple-400">{position.symbol}</span>
+                    <span className="text-xs text-dark-500 font-mono">
+                      {position.intent_id.substring(0, 12)}...
+                    </span>
+                  </div>
+
+                  {/* 方向 */}
+                  <div className="col-span-1 flex items-center justify-center">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                       position.direction === 'long' 
                         ? 'bg-green-500/20 text-green-400' 
                         : 'bg-red-500/20 text-red-400'
                     }`}>
                       {position.direction === 'long' ? '做多' : '做空'}
-                    </div>
+                    </span>
                   </div>
 
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-dark-400 text-sm">数量</span>
-                      <span className="font-semibold">{Math.abs(position.units).toFixed(0)}</span>
-                    </div>
+                  {/* 数量 */}
+                  <div className="col-span-1 flex items-center justify-end">
+                    <span className="font-semibold">{Math.abs(position.units).toFixed(0)}</span>
+                  </div>
 
-                    <div className="flex items-center justify-between">
-                      <span className="text-dark-400 text-sm">成交价</span>
-                      <span className="font-mono font-semibold text-purple-400">
-                        {position.entry_price.toFixed(5)}
-                      </span>
-                    </div>
+                  {/* 成交价 */}
+                  <div className="col-span-1 flex items-center justify-end">
+                    <span className="font-mono text-sm text-purple-400">
+                      {position.entry_price.toFixed(5)}
+                    </span>
+                  </div>
 
-                    {position.current_price && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-dark-400 text-sm">市价</span>
-                        <span className="font-mono font-semibold">
-                          {position.current_price.toFixed(5)}
-                        </span>
-                      </div>
-                    )}
+                  {/* 市价 */}
+                  <div className="col-span-1 flex items-center justify-end">
+                    <span className="font-mono text-sm font-semibold">
+                      {position.current_price ? position.current_price.toFixed(5) : '-'}
+                    </span>
+                  </div>
 
+                  {/* 止损 */}
+                  <div className="col-span-1 flex items-center justify-end">
+                    <span className="text-sm font-mono text-red-400">
+                      {position.stop_loss ? position.stop_loss.toFixed(5) : '-'}
+                    </span>
+                  </div>
+
+                  {/* 止盈 */}
+                  <div className="col-span-1 flex items-center justify-end">
+                    <span className="text-sm font-mono text-green-400">
+                      {position.take_profit ? position.take_profit.toFixed(5) : '-'}
+                    </span>
+                  </div>
+
+                  {/* 浮动盈亏 */}
+                  <div className="col-span-1 flex items-center justify-end">
                     {position.unrealized_pl !== null && (
-                      <div className={`flex items-center justify-between p-3 rounded-lg ${
+                      <div className={`flex items-center space-x-1 px-2 py-1 rounded ${
                         isProfitable ? 'bg-green-500/10' : 'bg-red-500/10'
                       }`}>
-                        <div className="flex items-center space-x-2">
-                          <DollarSign className={`w-4 h-4 ${isProfitable ? 'text-green-400' : 'text-red-400'}`} />
-                          <span className="text-sm font-medium">未实现盈亏</span>
-                        </div>
-                        <span className={`font-bold ${isProfitable ? 'text-green-400' : 'text-red-400'}`}>
+                        <DollarSign className={`w-3 h-3 ${isProfitable ? 'text-green-400' : 'text-red-400'}`} />
+                        <span className={`text-sm font-bold ${isProfitable ? 'text-green-400' : 'text-red-400'}`}>
                           {isProfitable ? '+' : ''}{position.unrealized_pl.toFixed(2)}
                         </span>
                       </div>
                     )}
+                  </div>
 
-                    {position.margin && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-dark-400 text-sm">保证金</span>
-                        <span className="font-semibold text-yellow-400">
-                          {position.margin.toFixed(2)}
-                        </span>
-                      </div>
-                    )}
+                  {/* 保证金 */}
+                  <div className="col-span-1 flex items-center justify-end">
+                    <span className="text-sm text-yellow-400">
+                      {position.margin ? position.margin.toFixed(2) : '-'}
+                    </span>
+                  </div>
 
-                    <div className="pt-3 border-t border-dark-700">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center space-x-1">
-                          <TrendingDown className="w-4 h-4 text-red-400" />
-                          <span className="text-xs text-dark-400">止损</span>
-                        </div>
-                        <span className="text-sm font-mono text-red-400">
-                          {position.stop_loss ? position.stop_loss.toFixed(5) : '-'}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-1">
-                          <TrendingUp className="w-4 h-4 text-green-400" />
-                          <span className="text-xs text-dark-400">止盈</span>
-                        </div>
-                        <span className="text-sm font-mono text-green-400">
-                          {position.take_profit ? position.take_profit.toFixed(5) : '-'}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center space-x-2 pt-2 text-xs text-dark-500">
-                      <Clock className="w-3 h-3" />
-                      <span>{new Date(position.created_at).toLocaleString('zh-CN')}</span>
+                  {/* 时间 */}
+                  <div className="col-span-1 flex items-center justify-center">
+                    <div className="flex flex-col items-center text-xs text-dark-500">
+                      <Clock className="w-3 h-3 mb-1" />
+                      <span>{new Date(position.created_at).toLocaleDateString('zh-CN')}</span>
                     </div>
                   </div>
 
-                  <div className="mt-4 pt-4 border-t border-dark-700">
-                    <button className="w-full py-2 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 rounded-lg transition-colors text-sm font-medium">
-                      查看详情
-                    </button>
+                  {/* 操作 */}
+                  <div className="col-span-1 flex items-center justify-center">
+                    <Link
+                      href={`/positions/${position.intent_id}`}
+                      className="flex items-center space-x-1 px-3 py-1 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 rounded-lg transition-colors text-sm"
+                    >
+                      <span>详情</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </Link>
                   </div>
                 </div>
-              </Link>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
       )}
     </div>
   )
 }
-
